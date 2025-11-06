@@ -1,0 +1,621 @@
+asyncapi: '2.6.0'
+info:
+  title: Servizio WebSocket - Documentazione API
+  version: '1.0.3'
+  description: >
+    Documentazione del protocollo WebSocket del servizio. Il client invia messaggi JSON
+    per richiedere comandi, il server risponde con eventi, errori e status.
+
+servers:
+  production:
+    url: ws://indirizzoip:porta/ws
+    protocol: ws
+    description: Endpoint WebSocket principale (produzione)
+
+channels:
+  /ws:
+    description: Canale WebSocket per comunicazione client-server.
+    publish:
+      summary: Messaggi inviati dal client
+      message:
+        oneOf:
+          - $ref: '#/components/messages/HandshakeMessage'
+          - $ref: '#/components/messages/CommandMessage'
+    subscribe:
+      summary: Messaggi inviati dal server
+      message:
+        oneOf:
+          - $ref: '#/components/messages/StartCommandEvent'
+          - $ref: '#/components/messages/EndCommandEvent'
+          - $ref: '#/components/messages/ServerError'
+          - $ref: '#/components/messages/ServerEvent'
+          - $ref: '#/components/messages/StatusEvent'
+
+components:
+  messages:
+    HandshakeMessage:
+      name: handshake
+      title: Messaggio di presentazione
+      summary: Invio iniziale per identificare il client.
+      payload:
+        type: object
+        required:
+          - type
+          - websocketClientType
+          - clientCode
+        properties:
+          type:
+            type: string
+            enum: [handshake]
+          websocketClientType:
+            type: string
+            enum: [client, display]
+          clientCode:
+            type: string
+          clientName:
+            type: string
+          clientUserCode:
+            type: string
+          clientUserName:
+            type: string
+          force:
+            type: boolean
+      examples:
+        - payload:
+            type: handshake
+            websocketClientType: client
+            clientCode: "5"
+            clientName: "Cassa 1"
+            clientUserCode: "U001"
+            clientUserName: "Mario Rossi"
+            force: true
+
+    CommandMessage:
+      name: command
+      title: Messaggio di comando
+      summary: Invio di comandi dal client al server.
+      payload:
+        type: object
+        required:
+          - type
+          - code
+        properties:
+          type:
+            type: string
+            enum: [command]
+          code:
+            type: integer
+          name:
+            type: string
+          parameters:
+            type: object
+            additionalProperties: true
+      examples:
+        - payload:
+            type: command
+            code: 22
+            name: "nome client"
+            parameters:
+              amount: 500
+        - payload:
+            type: command
+            code: 40
+            name: "nome client"
+            parameters:
+              amount: 1500
+        - payload:
+            type: command
+            code: 40
+            name: "nome client"
+            parameters:
+              amount: 500
+              denominationList:
+                - denominationType: NOTE
+                  valueInt: 500
+                  currencyCode: EUR
+                  valueString: "5,00EUR"
+                  recyclingEnabled: true
+                  active: true
+                  stock: 1
+                  stock_recycler: 0
+                  stock_cashbox: 0
+                  channel: -1
+                  totalAmount: 500
+                  totalAmountString: "5,00EUR"
+        - payload:
+            type: command
+            code: 50
+            name: "nome client"
+            parameters:
+              device: ALL
+        - payload:
+            type: command
+            code: 500
+            name: "nome client"
+            parameters:
+              inventory: all
+
+    StartCommandEvent:
+      name: start_command_event
+      title: Inizio Comando
+      summary: Messaggio server all'inizio di un comando.
+      payload:
+        type: object
+        required:
+          - type
+          - requestID
+          - commandObj
+          - inventoryListAtTheMoment
+          - bl_version_and_build_number
+          - bl_version
+          - bl_build_number
+        properties:
+          type:
+            type: string
+            enum: [start_command_event]
+          requestID:
+            type: string
+          commandObj:
+            type: object
+            required:
+              - type
+              - requestId
+              - code
+              - name
+              - parameters
+              - bl_version_and_build_number
+              - bl_version
+              - bl_build_number
+            properties:
+              type:
+                type: string
+                enum: [command]
+              requestId:
+                type: string
+              code:
+                type: integer
+              name:
+                type: string
+              parameters:
+                type: object
+                additionalProperties: true
+              bl_version_and_build_number:
+                type: string
+              bl_version:
+                type: string
+              bl_build_number:
+                type: string
+          inventoryListAtTheMoment:
+            type: array
+            items:
+              type: object
+              properties:
+                denominationType:
+                  type: string
+                  enum: [COIN, NOTE]
+                valueInt:
+                  type: integer
+                currencyCode:
+                  type: string
+                valueString:
+                  type: string
+                recyclingEnabled:
+                  type: boolean
+                managed:
+                  type: boolean
+                active:
+                  type: boolean
+                stock:
+                  type: integer
+                stock_recycler:
+                  type: integer
+                stock_cashbox:
+                  type: integer
+                channel:
+                  type: integer
+                totalAmount:
+                  type: integer
+                totalAmountString:
+                  type: string
+                maxQty:
+                  type: integer
+                minQty:
+                  type: integer
+                alertMaxQty:
+                  type: integer
+                alertMinQty:
+                  type: integer
+                denominationStatus:
+                  type: integer
+          bl_version_and_build_number:
+            type: string
+          bl_version:
+            type: string
+          bl_build_number:
+            type: string
+
+    EndCommandEvent:
+      name: end_command_event
+      title: Fine Comando
+      summary: Messaggio server al termine di un comando.
+      payload:
+        type: object
+        required:
+          - type
+          - requestID
+          - commandObj
+          - transactionStatus
+          - totAmountRequested
+          - totAmountInsertedAtTheMoment
+          - totAmountToInsertAtTheMoment
+          - totAmountDispensedAtTheMoment
+          - bl_version_and_build_number
+          - bl_version
+          - bl_build_number
+          - inventoryDenominations
+        properties:
+          type:
+            type: string
+            enum: [end_command_event]
+          requestID:
+            type: string
+          commandObj:
+            type: object
+            required:
+              - type
+              - requestId
+              - code
+              - name
+              - parameters
+              - bl_version_and_build_number
+              - bl_version
+              - bl_build_number
+            properties:
+              type:
+                type: string
+                enum: [command]
+              requestId:
+                type: string
+              code:
+                type: integer
+              name:
+                type: string
+              parameters:
+                type: object
+                additionalProperties: true
+              bl_version_and_build_number:
+                type: string
+              bl_version:
+                type: string
+              bl_build_number:
+                type: string
+          transactionStatus:
+            type: integer
+            enum: [-1, 0, 1, 2, 9, 10, 11, 12, 100, 999]
+          totAmountRequested:
+            type: integer
+          totAmountInsertedAtTheMoment:
+            type: integer
+          totAmountToInsertAtTheMoment:
+            type: integer
+          totAmountDispensedAtTheMoment:
+            type: integer
+          bl_version_and_build_number:
+            type: string
+          bl_version:
+            type: string
+          bl_build_number:
+            type: string
+          inventoryDenominations:
+            type: array
+            items:
+              type: object
+              properties:
+                denominationType:
+                  type: string
+                  enum: [COIN, NOTE]
+                valueInt:
+                  type: integer
+                currencyCode:
+                  type: string
+                valueString:
+                  type: string
+                recyclingEnabled:
+                  type: boolean
+                managed:
+                  type: boolean
+                active:
+                  type: boolean
+                stock:
+                  type: integer
+                stock_recycler:
+                  type: integer
+                stock_cashbox:
+                  type: integer
+                channel:
+                  type: integer
+                totalAmount:
+                  type: integer
+                totalAmountString:
+                  type: string
+                maxQty:
+                  type: integer
+                minQty:
+                  type: integer
+                alertMaxQty:
+                  type: integer
+                alertMinQty:
+                  type: integer
+                denominationStatus:
+                  type: integer
+
+    ServerError:
+      name: error
+      title: Messaggio di errore
+      summary: Messaggio inviato dal server in caso di errore.
+      payload:
+        type: object
+        required:
+          - type
+          - code
+          - name
+        properties:
+          type:
+            type: string
+            enum: [error]
+          requestId:
+            type: string
+            nullable: true
+          code:
+            type: integer
+          name:
+            type: string
+          subErrorCode:
+            type: integer
+            nullable: true
+          subErrorName:
+            type: string
+            nullable: true
+          deviceBrand:
+            type: string
+          deviceModel:
+            type: string
+          deviceType:
+            type: string
+          error_message:
+            type: string
+          bl_version_and_build_number:
+            type: string
+          bl_version:
+            type: string
+          bl_build_number:
+            type: string
+      examples:
+        - payload:
+            type: error
+            requestId: null
+            code: -1024
+            name: cashboxRemoved
+            subErrorCode: null
+            subErrorName: null
+            deviceBrand: itl
+            deviceModel: spectralpayout
+            deviceType: NOTE
+            error_message: ""
+            bl_version_and_build_number: "1.10.21+10"
+            bl_version: "1.10.21"
+            bl_build_number: "10"
+
+    ServerEvent:
+      name: event
+      title: Evento server
+      summary: Messaggio di notifica asincrona.
+      payload:
+        type: object
+        required:
+          - type
+          - eventId
+          - code
+          - name
+        properties:
+          type:
+            type: string
+            enum: [event]
+          eventId:
+            type: integer
+          code:
+            type: integer
+          name:
+            type: string
+          internalEventCode:
+            type: integer
+          floated:
+            type: object
+            additionalProperties:
+              type: integer
+          requested:
+            type: object
+            additionalProperties:
+              type: integer
+          dispensed:
+            type: object
+            additionalProperties:
+              type: integer
+          payoutError:
+            type: integer
+          isException:
+            type: boolean
+          exception:
+            type: object
+            nullable: true
+          requestCommandName:
+            type: string
+          stackTrace:
+            type: string
+            nullable: true
+          requestID:
+            type: string
+            nullable: true
+          totAmountRequested:
+            type: integer
+          totAmountInsertedAtTheMoment:
+            type: integer
+          totAmountToInsertAtTheMoment:
+            type: integer
+          totAmountDispensedAtTheMoment:
+            type: integer
+          bl_version_and_build_number:
+            type: string
+          bl_version:
+            type: string
+          bl_build_number:
+            type: string
+          deviceModel:
+            type: string
+          deviceType:
+            type: string
+      examples:
+        - payload:
+            type: event
+            eventId: -1
+            code: 7008
+            name: cashboxReplaced
+            internalEventCode: 228
+            floated:
+              EUR: 0
+            requested:
+              EUR: 0
+            dispensed:
+              EUR: 0
+            payoutError: 0
+            isException: false
+            exception: null
+            requestCommandName: ""
+            stackTrace: null
+            requestID: null
+            totAmountRequested: 0
+            totAmountInsertedAtTheMoment: 0
+            totAmountToInsertAtTheMoment: 0
+            totAmountDispensedAtTheMoment: 0
+            bl_version_and_build_number: "1.10.21+10"
+            bl_version: "1.10.21"
+            bl_build_number: "10"
+            deviceModel: spectralpayout
+            deviceType: NOTE
+
+    StatusEvent:
+      name: status_event_obj
+      title: Status Event
+      summary: Aggiornamento dello stato dei dispositivi.
+      payload:
+        type: object
+        required:
+          - type
+          - status
+          - isTransactionActive
+          - commandObj
+          - isDrawerOnError
+          - isDrawerOnWarning
+          - coinDeviceStatus
+          - noteDeviceStatus
+          - withGui
+          - bl_version_and_build_number
+          - bl_version
+          - bl_build_number
+          - inventory
+        properties:
+          type:
+            type: string
+            enum: [status_event_obj]
+          status:
+            type: integer
+          isTransactionActive:
+            type: boolean
+          commandObj:
+            type: object
+            required:
+              - type
+              - requestId
+              - code
+              - name
+              - parameters
+              - bl_version_and_build_number
+              - bl_version
+              - bl_build_number
+            properties:
+              type:
+                type: string
+                enum: [command]
+              requestId:
+                type: string
+              code:
+                type: integer
+              name:
+                type: string
+              parameters:
+                type: object
+                additionalProperties: true
+              bl_version_and_build_number:
+                type: string
+              bl_version:
+                type: string
+              bl_build_number:
+                type: string
+          isDrawerOnError:
+            type: boolean
+          isDrawerOnWarning:
+            type: boolean
+          coinDeviceStatus:
+            type: integer
+          noteDeviceStatus:
+            type: integer
+          withGui:
+            type: boolean
+          bl_version_and_build_number:
+            type: string
+          bl_version:
+            type: string
+          bl_build_number:
+            type: string
+          inventory:
+            type: array
+            items:
+              type: object
+              properties:
+                denominationType:
+                  type: string
+                  enum: [COIN, NOTE]
+                valueInt:
+                  type: integer
+                currencyCode:
+                  type: string
+                valueString:
+                  type: string
+                recyclingEnabled:
+                  type: boolean
+                managed:
+                  type: boolean
+                active:
+                  type: boolean
+                stock:
+                  type: integer
+                stock_recycler:
+                  type: integer
+                stock_cashbox:
+                  type: integer
+                channel:
+                  type: integer
+                totalAmount:
+                  type: integer
+                totalAmountString:
+                  type: string
+                maxQty:
+                  type: integer
+                minQty:
+                  type: integer
+                alertMaxQty:
+                  type: integer
+                alertMinQty:
+                  type: integer
+                denominationStatus:
+                  type: integer
