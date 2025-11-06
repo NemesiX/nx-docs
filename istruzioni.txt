@@ -1,3 +1,22 @@
 Per creare una nuova versione HTML delle api websocket:
-- lanciare il comando
-  
+- NON USARE PER NESSUN MOTIVO sudo
+- modificare il file yaml/cm-websocket.yaml
+- eseguire commit e push del progetto "nx-docs"
+- lanciare il comando: 
+  npx @asyncapi/generator yaml/cm-websocket.yaml ./node_modules/@asyncapi/html-template -o cm-websocket
+- nella directory "/home/parallels/nx-docs/cm-websocket" saranno salvati tutti i file HTML
+- eseguire commit e push del progetto "nx-docs"
+
+Per creare una nuova versione HTML delle api restapi>
+- NON USARE PER NESSUN MOTIVO sudo
+- modificare il file yaml/cm-restapi.yaml
+- eseguire commit e push del progetto "nx-docs"
+- lanciare il comando: 
+  npx redoc-cli bundle yaml/cm-restapi.yaml -o cm-restapi/index.html
+- nella directory "/home/parallels/nx-docs/cm-restapi" saranno salvati tutti i file HTML
+- eseguire commit e push del progetto "nx-docs"
+
+
+Per visualizzare le API da browser:
+- cm-websocket: https://nemesix.github.io/nx-docs/cm-websocket/
+- cm-restapi: https://nemesix.github.io/nx-docs/cm-restapi/
