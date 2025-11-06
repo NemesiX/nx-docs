@@ -1,0 +1,855 @@
+openapi: 3.0.3
+info:
+  title: API Cassetto Denaro Elettronico CM (REST)
+  version: '1.0.0'
+  description: Elenco di API REST per l'autenticazione e il recupero delle informazioni di base del cassetto denaro elettronico CM.
+
+paths:
+  /auth/login:
+    post:
+      summary: Autenticazione Utente e Generazione Token
+      description: |
+        Il client si autentica inviando la stringa Base64 delle credenziali 
+        direttamente nell'header `Authorization`.
+        **Non è necessario alcun payload JSON nel corpo della richiesta.**
+        
+        **Credenziali:** Fornite dal nostro team, in formato `username|password` codificato in **Base64**.
+      tags:
+        - Autenticazione
+      
+      responses:
+        '200':
+          description: Autenticazione riuscita.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                properties:
+                  token:
+                    type: string
+                    description: Il Token JWT valido. Usalo come 'Bearer Token' nelle successive chiamate REST e nell'handshake WebSocket.
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHBpcnlfZGF0ZSI6IjIwMjYtMDEtMjlUMTQ6MTA6NDguNzMxMjM5IiwiaWF0IjoxNzYxOTE2MjI1fQ.2hg_yQVHU_lTVDFa0CqI_uv6QmQDZH1YDMEV38M6McY'
+        '401': 
+          description: Credenziali non valide (Non Autorizzato).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore di autenticazione.
+                example: "Bad username or password"
+        '500': 
+          description: Errore interno del server (es. database non raggiungibile).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore generico del server.
+                example: "Server Error"
+  
+  /api/1/devices_configuration:
+    get:
+      summary: Ottiene la configurazione del Cassetto Denaro Elettronico
+      description: |
+        Recupera i parametri di configurazione statici del Cassetto Denaro Elettronico.
+        
+        **Autenticazione richiesta:** Inserire nella Header la chiave Authorization con il seguente valore: Bearer JWT Token. Esempio: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHBpcnlfZGF0ZSI6IjIwMjYtMDEtMjlUMTQ6MTA6NDguNzMxMjM5IiwiaWF0IjoxNzYxOTE2MjI1fQ.2hg_yQVHU_lTVDFa0CqI_uv6QmQDZH1YDMEV38M6McY
+      tags:
+        - Configurazione
+      
+      responses:
+        '200':
+          description: Configurazione recuperata con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceConfigModel'
+              example:
+                - drawerData:
+                    model: "model001"
+                    code: "1"
+                    currencyCode: "EUR"
+                  devices:
+                    - deviceModel:
+                        type: "COIN"
+                        brand: "itl"
+                        model: "smartcoinsystem"
+                      connectionMap:
+                        type: "RS232"
+                        portName: "/dev/ttyCOIN0"
+                        baudRate: 9600
+                        dataBits: 8
+                        parity: "none"
+                        stopBits: 1
+                      denominationsList:
+                        - denominationType: "COIN"
+                          valueInt: 1
+                          currencyCode: "EUR"
+                          valueString: "0,01EUR"
+                          recyclingEnabled: false
+                          managed: true
+                          active: false
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "COIN"
+                          valueInt: 2
+                          currencyCode: "EUR"
+                          valueString: "0,02EUR"
+                          recyclingEnabled: false
+                          managed: true
+                          active: false
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "COIN"
+                          valueInt: 5
+                          currencyCode: "EUR"
+                          valueString: "0,05EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "COIN"
+                          valueInt: 10
+                          currencyCode: "EUR"
+                          valueString: "0,10EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "COIN"
+                          valueInt: 20
+                          currencyCode: "EUR"
+                          valueString: "0,20EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "COIN"
+                          valueInt: 50
+                          currencyCode: "EUR"
+                          valueString: "0,50EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "COIN"
+                          valueInt: 100
+                          currencyCode: "EUR"
+                          valueString: "1,00EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "COIN"
+                          valueInt: 200
+                          currencyCode: "EUR"
+                          valueString: "2,00EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: -1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                      parametersConfigMap:
+                        payMode: 0
+                        levelCheck: 1
+                        motorSpeed: 1
+                        cashBoxPayActive: 0
+                        route0LevelCoinsToCashbox: 0
+                        highEfficiencySplit: 1
+                        unknowToPayout: 1
+                        valueAdded: 0
+                        coinRejected: 1
+                        rejectEventFull: 1
+                        emptyRoute: 1
+                        fullToCashbox: 0
+                        valueCoin: 1
+                    - deviceModel:
+                        type: "NOTE"
+                        brand: "itl"
+                        model: "spectralpayout"
+                      connectionMap:
+                        type: "RS232"
+                        portName: "/dev/ttyUSB1"
+                        baudRate: 9600
+                        dataBits: 8
+                        parity: "none"
+                        stopBits: 1
+                      denominationsList:
+                        - denominationType: "NOTE"
+                          valueInt: 500
+                          currencyCode: "EUR"
+                          valueString: "5,00EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: 1
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "NOTE"
+                          valueInt: 1000
+                          currencyCode: "EUR"
+                          valueString: "10,00EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: 2
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "NOTE"
+                          valueInt: 2000
+                          currencyCode: "EUR"
+                          valueString: "20,00EUR"
+                          recyclingEnabled: true
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: 3
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "NOTE"
+                          valueInt: 5000
+                          currencyCode: "EUR"
+                          valueString: "50,00EUR"
+                          recyclingEnabled: false
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: 4
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "NOTE"
+                          valueInt: 10000
+                          currencyCode: "EUR"
+                          valueString: "100,00EUR"
+                          recyclingEnabled: false
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: 5
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "NOTE"
+                          valueInt: 20000
+                          currencyCode: "EUR"
+                          valueString: "200,00EUR"
+                          recyclingEnabled: false
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: 6
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                        - denominationType: "NOTE"
+                          valueInt: 50000
+                          currencyCode: "EUR"
+                          valueString: "500,00EUR"
+                          recyclingEnabled: false
+                          managed: true
+                          active: true
+                          stock: 0
+                          stock_recycler: 0
+                          stock_cashbox: 0
+                          channel: 7
+                          totalAmount: 0
+                          totalAmountString: "0,00EUR"
+                          maxQty: 0
+                          minQty: 0
+                          alertMaxQty: 0
+                          alertMinQty: 0
+                          denominationStatus: 0
+                      parametersConfigMap: {}
+                  serialPorts:
+                    - "*** NO SERIAL PORTS DETECTED ***"
+                  usbPorts:
+                    - "*** NO USB PORTS DETECTED ***"
+
+        '401': 
+          description: Credenziali non valide (Non Autorizzato).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore di autenticazione.
+                example: "Bad username or password"
+        '500': 
+          description: Errore interno del server (es. database non raggiungibile).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore generico del server.
+                example: "Server Error"
+
+  /api/1/device_network_configuration:
+    get:
+      summary: Ottiene la configurazione di rete del dispositivo
+      description: |
+        Recupera i parametri di configurazione di rete del Cassetto Denaro Elettronico (IP, Gateway, DNS, ecc.).
+        
+        **Autenticazione richiesta:** Inserire nella Header la chiave Authorization con il seguente valore: Bearer JWT Token. Esempio: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHBpcnlfZGF0ZSI6IjIwMjYtMDEtMjlUMTQ6MTA6NDguNzMxMjM5IiwiaWF0IjoxNzYxOTE2MjI1fQ.2hg_yQVHU_lTVDFa0CqI_uv6QmQDZH1YDMEV38M6McY
+      tags:
+        - Configurazione Rete
+      
+      responses:
+        '200':
+          description: Dettagli di configurazione di rete recuperati con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NetworkConfigModel'
+              example:
+                - enable_dhcp: false
+                  ip: "172.31.20.189"
+                  netmask: "255.255.255.0"
+                  device: "eno1"
+                  gateway: "172.31.20.254"
+                  dns:
+                    - "8.8.8.8"
+                    - "1.1.1.1"
+                  hostName: "deb-dev002"
+        '401': 
+          description: Credenziali non valide (Non Autorizzato).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore di autenticazione.
+                example: "Bad username or password"
+        '500': 
+          description: Errore interno del server (es. database non raggiungibile).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore generico del server.
+                example: "Server Error"
+
+  /api/1/getstatus:
+    get:
+      summary: Ottiene lo stato operativo attuale del dispositivo
+      description: |
+        Fornisce un'istantanea dello stato del Cassetto Denaro Elettronico e dei suoi componenti.
+        
+        **Autenticazione richiesta:** Inserire nella Header la chiave Authorization con il seguente valore: Bearer JWT Token. Esempio: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHBpcnlfZGF0ZSI6IjIwMjYtMDEtMjlUMTQ6MTA6NDguNzMxMjM5IiwiaWF0IjoxNzYxOTE2MjI1fQ.2hg_yQVHU_lTVDFa0CqI_uv6QmQDZH1YDMEV38M6McY
+      tags:
+        - Stato
+      
+      responses:
+        '200':
+          description: Stato del dispositivo recuperato con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceStatusModel'
+              example:
+                - type: "status_event_obj"
+                  status: 0
+                  isTransactionActive: false
+                  commandObj:
+                    type: "command"
+                    requestId: ""
+                    code: 200
+                    name: "status"
+                    parameters: {}
+                    bl_version_and_build_number: "1.10.21+10"
+                    bl_version: "1.10.21"
+                    bl_build_number: "10"
+                  isDrawerOnError: false
+                  isDrawerOnWarning: false
+                  coinDeviceStatus: 0
+                  noteDeviceStatus: 0
+                  withGui: false
+                  bl_version_and_build_number: "1.10.21+10"
+                  bl_version: "1.10.21"
+                  bl_build_number: "10"
+        '401': 
+          description: Credenziali non valide (Non Autorizzato).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore di autenticazione.
+                example: "Bad username or password"
+        '500': 
+          description: Errore interno del server (es. database non raggiungibile).
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Stringa che descrive l'errore generico del server.
+                example: "Server Error"
+
+components:
+  schemas:
+    # ----------------------------------------------------
+    # API AUTH SCHEMAS (AuthResponse)
+    # ----------------------------------------------------
+    AuthResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: Il Token JWT valido. Usalo come 'Bearer Token' nelle successive chiamate REST e nell'handshake WebSocket.
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHBpcnlfZGF0ZSI6IjIwMjYtMDEtMjlUMTQ6MTA6NDguNzMxMjM5IiwiaWF0IjoxNzYxOTE2MjI1fQ.2hg_yQVHU_lTVDFa0CqI_uv6QmQDZH1YDMEV38M6McY'
+
+    # ----------------------------------------------------
+    # DEVICE CONFIGURATION SCHEMAS
+    # ----------------------------------------------------
+    DeviceConfigModel:
+      type: object
+      description: Il modello di configurazione completo per un Cassetto Denaro Elettronico (risposta di base).
+      properties:
+        drawerData:
+          $ref: '#/components/schemas/DrawerData'
+          description: Dati identificativi e generici del cassetto.
+        devices:
+          type: array
+          description: Lista dei singoli dispositivi di gestione del denaro (es. lettori di monete, banconote).
+          items:
+            $ref: '#/components/schemas/ConnectedDevice'
+        serialPorts:
+          type: array
+          description: Lista delle porte seriali rilevate dal sistema.
+          items:
+            type: string
+          example: ["/dev/ttyS0", "*** NO SERIAL PORTS DETECTED ***"]
+        usbPorts:
+          type: array
+          description: Lista delle porte USB rilevate dal sistema.
+          items:
+            type: string
+          example: ["/dev/ttyUSB1", "*** NO USB PORTS DETECTED ***"]
+
+    DrawerData:
+      type: object
+      description: Dati di base del cassetto.
+      properties:
+        model:
+          type: string
+          description: Il modello specifico del cassetto denaro.
+          example: "model001"
+        code:
+          type: string
+          description: Codice identificativo del cassetto.
+          example: "1"
+        currencyCode:
+          type: string
+          description: Codice ISO della valuta configurata.
+          example: "EUR"
+          
+    ConnectedDevice:
+      type: object
+      description: Dettagli di un dispositivo connesso.
+      properties:
+        deviceModel:
+          $ref: '#/components/schemas/DeviceModel'
+          description: Modello e tipo di dispositivo.
+        connectionMap:
+          $ref: '#/components/schemas/ConnectionMap'
+          description: Mappatura e parametri di connessione fisica (porta, velocità).
+        denominationsList:
+          type: array
+          description: Lista completa dei tagli di denaro gestiti dal dispositivo.
+          items:
+            $ref: '#/components/schemas/Denomination'
+        parametersConfigMap:
+          type: object
+          description: Mappa di configurazione specifica per il dispositivo (chiavi/valori operativi).
+          additionalProperties:
+            type: integer
+          example: {"payMode": 0, "levelCheck": 1}
+
+    DeviceModel:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [COIN, NOTE]
+          description: Tipo di unità gestita (Monete o Banconote).
+          example: "COIN"
+        brand:
+          type: string
+          description: Marca del dispositivo (es. itl).
+          example: "itl"
+        model:
+          type: string
+          description: Modello specifico del dispositivo hardware.
+          example: "smartcoinsystem"
+
+    ConnectionMap:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [RS232, USB, NETWORK]
+          description: Tipo di connessione fisica utilizzata.
+          example: "RS232"
+        portName:
+          type: string
+          description: Nome della porta seriale o USB.
+          example: "/dev/ttyCOIN0"
+        baudRate:
+          type: integer
+          description: Velocità di trasmissione dati.
+          example: 9600
+        dataBits:
+          type: integer
+          description: Numero di bit di dati.
+          example: 8
+        parity:
+          type: string
+          enum: [none, even, odd]
+          description: Tipo di parità.
+          example: "none"
+        stopBits:
+          type: integer
+          description: Numero di bit di stop.
+          example: 1
+
+    Denomination:
+      type: object
+      description: Configurazione e stato di un singolo taglio di denaro.
+      properties:
+        denominationType:
+          type: string
+          enum: [COIN, NOTE]
+          description: Tipo di taglio (Moneta o Banconota).
+          example: "COIN"
+        valueInt:
+          type: integer
+          description: Valore del taglio in centesimi (es. 500 per 5 EUR, 50 per 0.50 EUR).
+          example: 50
+        currencyCode:
+          type: string
+          description: Codice valuta.
+          example: "EUR"
+        valueString:
+          type: string
+          description: Valore del taglio formattato come stringa.
+          example: "0,50EUR"
+        recyclingEnabled:
+          type: boolean
+          description: Indica se il taglio è abilitato al riciclo (per il resto).
+          example: true
+        managed:
+          type: boolean
+          description: Indica se il taglio è gestito attivamente dal dispositivo.
+          example: true
+        active:
+          type: boolean
+          description: Indica se il canale di questo taglio è attivo.
+          example: true
+        stock:
+          type: integer
+          description: Quantità totale di questo taglio presente in stock.
+          example: 12
+        stock_recycler:
+          type: integer
+          description: Quantità presente nel modulo riciclatore.
+          example: 12
+        stock_cashbox:
+          type: integer
+          description: Quantità presente nel cassetto/cassetta di sicurezza (cashbox).
+          example: 0
+        channel:
+          type: integer
+          description: ID del canale fisico associato al taglio.
+          example: 1
+        totalAmount:
+          type: number
+          description: Ammontare totale del valore in stock (in unità decimali, es. 6.0 per 6 EUR).
+          example: 6.0
+        totalAmountString:
+          type: string
+          description: Ammontare totale in stock formattato come stringa localizzata.
+          example: "6,00EUR"
+        maxQty:
+          type: integer
+          description: Quantità massima configurata per questo taglio.
+          example: 100
+        minQty:
+          type: integer
+          description: Quantità minima configurata per questo taglio.
+          example: 10
+        alertMaxQty:
+          type: integer
+          description: Soglia massima di allerta.
+          example: 80
+        alertMinQty:
+          type: integer
+          description: Soglia minima di allerta.
+          example: 20
+        denominationStatus:
+          type: integer
+          description: Stato operativo numerico del taglio (es. 0=VUOTO - 1=QUASI VUOTO - 2=OK - 3=QUASI PIENO - 4=PIENO - 5=NEGATIVO - 6=SOVRACCARICO).
+          example: 0
+          
+    # ----------------------------------------------------
+    # DEVICE NETWORK CONFIGURATION SCHEMAS
+    # ----------------------------------------------------
+    NetworkConfigModel:
+      type: object
+      description: Dettagli della configurazione di rete del dispositivo.
+      properties:
+        enable_dhcp:
+          type: boolean
+          description: Indica se il DHCP è abilitato (`true`) o se l'IP è statico (`false`).
+          example: false
+        ip:
+          type: string
+          description: Indirizzo IP assegnato o statico.
+          example: "172.31.20.189"
+        netmask:
+          type: string
+          description: Sottorete (Netmask).
+          example: "255.255.255.0"
+        device:
+          type: string
+          description: Nome dell'interfaccia di rete (es. eno1).
+          example: "eno1"
+        gateway:
+          type: string
+          description: Indirizzo IP del Gateway predefinito.
+          example: "172.31.20.254"
+        dns:
+          type: array
+          description: Lista degli indirizzi IP dei server DNS.
+          items:
+            type: string
+          example: ["8.8.8.8", "1.1.1.1"]
+        hostName:
+          type: string
+          description: Nome host del dispositivo nella rete.
+          example: "deb-dev002"
+          
+    # ----------------------------------------------------
+    # NUOVO SCHEMA: DEVICE STATUS
+    # ----------------------------------------------------
+    DeviceStatusModel:
+      type: object
+      description: Modello di risposta per lo stato operativo istantaneo del dispositivo cassa.
+      properties:
+        type:
+          type: string
+          description: Tipo di oggetto evento, in genere 'status_event_obj'.
+          example: "status_event_obj"
+        status:
+          type: integer
+          description: Codice di stato generale del dispositivo (0 = OK).
+          example: 0
+        isTransactionActive:
+          type: boolean
+          description: Indica se una transazione (deposito/erogazione) è attualmente in corso.
+          example: false
+        commandObj:
+          $ref: '#/components/schemas/StatusCommandObject'
+          description: Dettagli dell'ultimo comando di stato eseguito.
+        isDrawerOnError:
+          type: boolean
+          description: Indica se il cassetto si trova in uno stato di errore critico.
+          example: false
+        isDrawerOnWarning:
+          type: boolean
+          description: Indica se il cassetto ha un avviso (es. stock basso).
+          example: false
+        coinDeviceStatus:
+          type: integer
+          description: Stato specifico del dispositivo monete (0 = OK).
+          example: 0
+        noteDeviceStatus:
+          type: integer
+          description: Stato specifico del dispositivo banconote (0 = OK).
+          example: 0
+        withGui:
+          type: boolean
+          description: Indica se l'applicazione è in esecuzione con un'interfaccia grafica (GUI).
+          example: false
+        bl_version_and_build_number:
+          type: string
+          description: Versione del software del cassetto con numero di build.
+          example: "1.10.21+10"
+        bl_version:
+          type: string
+          description: Versione del software del cassetto.
+          example: "1.10.21"
+        bl_build_number:
+          type: string
+          description: Numero di build del software del cassetto.
+          example: "10"
+
+    StatusCommandObject:
+      type: object
+      description: Dettagli interni del comando di stato.
+      properties:
+        type:
+          type: string
+          example: "command"
+        requestId:
+          type: string
+          description: ID della richiesta associata.
+          example: ""
+        code:
+          type: integer
+          example: 200
+        name:
+          type: string
+          example: "status"
+        parameters:
+          type: object
+          description: Parametri specifici del comando (vuoto in questo caso).
+          additionalProperties: {}
+        bl_version_and_build_number:
+          type: string
+          example: "1.10.21+10"
+        bl_version:
+          type: string
+          example: "1.10.21"
+        bl_build_number:
+          type: string
+          example: "10"
+    
+    # ----------------------------------------------------
+    # SCHEMI DI ERRORE
+    # ----------------------------------------------------
+    Error:
+      type: object
+      description: Formato standard per le risposte di errore JSON (Status 401/404).
+      properties:
+        code:
+          type: integer
+          description: Codice di errore interno specifico del sistema.
+          example: 1001
+        message:
+          type: string
+          description: Descrizione leggibile dell'errore.
+          example: "Token is missing or expired"
