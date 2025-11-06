@@ -1,0 +1,3 @@
+Per creare una nuova versione HTML delle api websocket:
+- lanciare il comando
+  
