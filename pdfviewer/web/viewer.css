@@ -7474,12 +7474,8 @@ dialog :link{
   }
 }
 
-/* Regola per nascondere il pulsante Download */
-#downloadButton {
+/* Nasconde l'intera barra degli strumenti dell'Editor/Annotazioni */
+#editorToolbar {
     display: none !important;
 }
 
-/* Regola per nascondere il pulsante Stampa (opzionale) */
-#printButton {
-    display: none !important;
-}
