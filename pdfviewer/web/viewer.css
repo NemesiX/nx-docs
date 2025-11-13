@@ -7508,6 +7508,7 @@ dialog :link{
     display: none !important;
 }
 
-
-
+#toolbarViewerRight > button {
+    display: none !important;
+}
 
