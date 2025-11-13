@@ -7474,8 +7474,40 @@ dialog :link{
   }
 }
 
-/* Nasconde l'intera barra degli strumenti dell'Editor/Annotazioni */
-#editorToolbar {
+/* Regola per nascondere il pulsante Download */
+#downloadButton {
     display: none !important;
 }
+
+/* Regola per nascondere il pulsante Stampa (opzionale) */
+#printButton {
+    display: none !important;
+}
+
+#editorCommentButton {
+    display: none !important;
+}
+
+#editorSignatureButton {
+    display: none !important;
+}
+
+#editorHighlightButton {
+    display: none !important;
+}
+
+#editorFreeTextButton {
+    display: none !important;
+}
+
+#editorInkButton {
+    display: none !important;
+}
+
+#editorStampButton {
+    display: none !important;
+}
+
+
+
 
