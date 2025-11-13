@@ -7473,3 +7473,13 @@ dialog :link{
     display:none;
   }
 }
+
+/* Regola per nascondere il pulsante Download */
+#downloadButton {
+    display: none !important;
+}
+
+/* Regola per nascondere il pulsante Stampa (opzionale) */
+#printButton {
+    display: none !important;
+}
