@@ -20,5 +20,8 @@
   "dependencies": {
     "@asyncapi/generator": "^1.17.25",
     "@asyncapi/html-template": "^0.28.2"
+  },
+  "devDependencies": {
+    "redoc-cli": "^0.13.21"
   }
 }
